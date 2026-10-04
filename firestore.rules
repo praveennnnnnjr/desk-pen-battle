@@ -1,0 +1,86 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isMe(uid) { return signedIn() && request.auth.uid == uid; }
+
+    // ---- Player profiles --------------------------------------------------
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow create, update: if isMe(uid)
+        && request.resource.data.keys().hasOnly(['displayName', 'wins', 'losses', 'createdAt']);
+      allow delete: if false;
+    }
+
+    // ---- Matches ----------------------------------------------------------
+    match /matches/{matchId} {
+      function isPlayer() { return signedIn() && request.auth.uid in resource.data.players; }
+      function unchanged(fields) { return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields); }
+
+      // Waiting matches must be readable so others can find and join them.
+      allow read: if signedIn() && (resource.data.status == 'waiting' || isPlayer());
+
+      // Host creates a waiting match containing only themselves.
+      allow create: if signedIn()
+        && request.resource.data.hostId == request.auth.uid
+        && request.resource.data.players == [request.auth.uid]
+        && request.resource.data.status == 'waiting';
+
+      // A second player joins a waiting match.
+      allow update: if signedIn()
+        && resource.data.status == 'waiting'
+        && request.auth.uid != resource.data.hostId
+        && request.resource.data.status == 'active'
+        && request.resource.data.guestId == request.auth.uid
+        && request.resource.data.players == [resource.data.hostId, request.auth.uid]
+        && unchanged(['hostId', 'state', 'lastShot', 'shotSeq', 'winnerId', 'loserId']);
+
+      // Host keeps a waiting match alive.
+      allow update: if isMe(resource.data.hostId)
+        && resource.data.status == 'waiting'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['heartbeatAt']);
+
+      // Players update an active / finished match, but never the roster.
+      allow update: if isPlayer()
+        && resource.data.status in ['active', 'finished', 'abandoned']
+        && unchanged(['hostId', 'guestId', 'players', 'names']);
+
+      // Host may cancel while still waiting.
+      allow delete: if isMe(resource.data.hostId) && resource.data.status == 'waiting';
+
+      // ---- Post-game chat -------------------------------------------------
+      match /messages/{msgId} {
+        function parentMatch() { return get(/databases/$(database)/documents/matches/$(matchId)).data; }
+        function inMatch() { return signedIn() && request.auth.uid in parentMatch().players; }
+        function validText() {
+          return request.resource.data.text is string
+            && request.resource.data.text.size() > 0
+            && request.resource.data.text.size() <= 280
+            && request.resource.data.senderId == request.auth.uid;
+        }
+
+        allow read: if inMatch();
+
+        // Only the winner sends the (single) challenge.
+        allow create: if inMatch() && validText()
+          && msgId == 'challenge' && request.resource.data.kind == 'challenge'
+          && request.auth.uid == parentMatch().winnerId;
+
+        // Only the loser sends the (single) reply, after the challenge exists.
+        allow create: if inMatch() && validText()
+          && msgId == 'reply' && request.resource.data.kind == 'reply'
+          && request.auth.uid == parentMatch().loserId
+          && exists(/databases/$(database)/documents/matches/$(matchId)/messages/challenge);
+
+        // Free chat afterwards.
+        allow create: if inMatch() && validText()
+          && msgId != 'challenge' && msgId != 'reply'
+          && request.resource.data.kind == 'chat';
+
+        allow update, delete: if false;
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Desk Battle: Pen Clash",
+    "slug": "desk-battle-pen-clash",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#2B1D14",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2B1D14"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.example.deskbattle"
+    },
+    "android": {
+      "package": "com.example.deskbattle",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#2B1D14"
+      }
+    }
+  }
+}
