@@ -74,14 +74,13 @@ export default function DeskBoard({ worldRef, flipped = false, aim, activePenId,
     const { width, height } = e.nativeEvent.layout;
     const aspect = DESK.width / DESK.height; // 1000 / 1500 = 0.666
     
-    // Desk romba perusa stretch aagamal irukka, width matrum height-ai balance sekirom
-    let w = width * 0.85;
-    let h = w / aspect;
+    // Desk romba perusaa stretch aagamal, screen height-il 68% mattum eduthukollum
+    let h = height * 0.68;
+    let w = h * aspect;
     
-    // Height romba jasthi irunthal, athai control panni proper-a fit pannum
-    if (h > height * 0.82) {
-      h = height * 0.82;
-      w = h * aspect;
+    if (w > width * 0.9) {
+      w = width * 0.9;
+      h = w / aspect;
     }
     setBox({ w, h });
   };
@@ -99,7 +98,7 @@ export default function DeskBoard({ worldRef, flipped = false, aim, activePenId,
           <View style={StyleSheet.absoluteFill} pointerEvents="none">
           <ImageBackground
             source={ASSETS.desk}
-            resizeMode="stretch"
+            resizeMode="cover"
             style={[StyleSheet.absoluteFill, styles.desk]}
             imageStyle={{ borderRadius: 12 }}
           />
