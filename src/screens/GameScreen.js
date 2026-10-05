@@ -152,7 +152,6 @@ export default function GameScreen({ navigation, route }) {
       },
       (e) => Alert.alert('Connection lost', e.message)
     );
-    // engine functions are stable (useCallback); intentionally subscribe once.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, matchId, user.uid]);
 
@@ -280,26 +279,29 @@ export default function GameScreen({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <ScoreBoard players={players} scores={match.scores} round={match.round} turn={match.turn} leftPen={myPen || 'p1'} />
+      {/* Web-la desk perusa stretch aagamal irukka gameWrapper kulla wrap seiyappattullathu */}
+      <View style={styles.gameWrapper}>
+        <ScoreBoard players={players} scores={match.scores} round={match.round} turn={match.turn} leftPen={myPen || 'p1'} />
 
-      <DeskBoard
-        worldRef={worldRef}
-        flipped={mode === 'online' && myPen === 'p2'}
-        aim={aim}
-        activePenId={phase === 'ready' ? match.turn : null}
-        onGrab={onGrab}
-        onDrag={onDrag}
-        onRelease={onRelease}
-        onCancel={() => setAim(null)}
-      />
+        <DeskBoard
+          worldRef={worldRef}
+          flipped={mode === 'online' && myPen === 'p2'}
+          aim={aim}
+          activePenId={phase === 'ready' ? match.turn : null}
+          onGrab={onGrab}
+          onDrag={onDrag}
+          onRelease={onRelease}
+          onCancel={() => setAim(null)}
+        />
 
-      <View style={styles.footer}>
-        <Text style={styles.hint}>{hint}</Text>
-        <PowerBar power={aim?.preview?.power || 0} color={PLAYER_COLORS[aim?.penId || match.turn]} />
-        <Button title="Quit" variant="ghost" onPress={() => navigation.goBack()} style={styles.quit} />
+        <View style={styles.footer}>
+          <Text style={styles.hint}>{hint}</Text>
+          <PowerBar power={aim?.preview?.power || 0} color={PLAYER_COLORS[aim?.penId || match.turn]} />
+          <Button title="Quit" variant="ghost" onPress={() => navigation.goBack()} style={styles.quit} />
+        </View>
+
+        {banner && <Banner banner={banner} players={players} winner={match.winner} />}
       </View>
-
-      {banner && <Banner banner={banner} players={players} winner={match.winner} />}
     </SafeAreaView>
   );
 }
@@ -347,8 +349,22 @@ function Banner({ banner, players, winner }) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.bgDeep },
+  safe: { flex: 1, backgroundColor: colors.bgDeep, alignItems: 'center', justifyContent: 'center' },
   center: { alignItems: 'center', justifyContent: 'center' },
+  // Web-kku responsive-ah game screen-ai limit seiyura wrapper
+  gameWrapper: {
+    width: '100%',
+    maxWidth: 450,
+    height: '100%',
+    maxHeight: 850,
+    backgroundColor: colors.bgDeep,
+    overflow: 'hidden',
+    alignSelf: 'center',
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
   footer: { paddingHorizontal: spacing(5), paddingBottom: spacing(2), alignItems: 'center' },
   hint: { color: colors.textOnDark, fontWeight: '700', fontSize: 15, marginTop: spacing(2), textAlign: 'center' },
   powerTrack: {
@@ -361,7 +377,7 @@ const styles = StyleSheet.create({
   },
   powerFill: { height: '100%', borderRadius: 4 },
   quit: { marginTop: spacing(2), minHeight: 40, alignSelf: 'stretch' },
-  bannerWrap: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
+  bannerWrap: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', zIndex: 999 },
   banner: {
     backgroundColor: 'rgba(30,20,14,0.92)',
     borderWidth: 3,
@@ -373,4 +389,3 @@ const styles = StyleSheet.create({
   bannerTitle: { fontSize: 36, fontWeight: '900', letterSpacing: 2 },
   bannerSub: { color: colors.textOnDark, marginTop: spacing(1), fontSize: 16, fontWeight: '600' },
 });
-
