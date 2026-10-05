@@ -72,11 +72,15 @@ export default function DeskBoard({ worldRef, flipped = false, aim, activePenId,
 
   const onContainerLayout = (e) => {
     const { width, height } = e.nativeEvent.layout;
-    const aspect = DESK.width / DESK.height;
-    let w = width * 0.9;
+    const aspect = DESK.width / DESK.height; // 1000 / 1500 = 0.666
+    
+    // Desk romba perusa stretch aagamal irukka, width matrum height-ai balance sekirom
+    let w = width * 0.85;
     let h = w / aspect;
-    if (h > height * 0.92) {
-      h = height * 0.92;
+    
+    // Height romba jasthi irunthal, athai control panni proper-a fit pannum
+    if (h > height * 0.82) {
+      h = height * 0.82;
       w = h * aspect;
     }
     setBox({ w, h });
@@ -97,7 +101,7 @@ export default function DeskBoard({ worldRef, flipped = false, aim, activePenId,
             source={ASSETS.desk}
             resizeMode="stretch"
             style={[StyleSheet.absoluteFill, styles.desk]}
-            imageStyle={{ borderRadius: 10 }}
+            imageStyle={{ borderRadius: 12 }}
           />
           {world.pens.map((pen) => (
             <PenView
@@ -245,9 +249,9 @@ function AimGuide({ aim, scale, toScreen }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center', width: '100%' },
   desk: {
-    borderRadius: 10,
+    borderRadius: 12,
     shadowColor: '#000',
     shadowOpacity: 0.5,
     shadowRadius: 18,
