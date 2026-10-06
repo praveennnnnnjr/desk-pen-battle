@@ -74,12 +74,12 @@ export default function DeskBoard({ worldRef, flipped = false, aim, activePenId,
     const { width, height } = e.nativeEvent.layout;
     const aspect = DESK.width / DESK.height; // 1000 / 1500 = 0.666
     
-    // Desk size-ai crct-ah align panna height 38% mattum set pannirukom
-    let h = height * 0.38;
+    // Desk size-oda height-ai mattum romba perusa irukkirathaluku 48% aakki, aspect ratio-voda fit pannirukom
+    let h = height * 0.48;
     let w = h * aspect;
     
-    if (w > width * 0.8) {
-      w = width * 0.8;
+    if (w > width * 0.9) {
+      w = width * 0.9;
       h = w / aspect;
     }
     setBox({ w, h });
@@ -100,7 +100,7 @@ export default function DeskBoard({ worldRef, flipped = false, aim, activePenId,
             source={ASSETS.desk}
             resizeMode="contain"
             style={[StyleSheet.absoluteFill, styles.desk]}
-            imageStyle={{ borderRadius: 12 }}
+            imageStyle={{ borderRadius: 12, resizeMode: 'contain' }}
           />
           {world.pens.map((pen) => (
             <PenView
