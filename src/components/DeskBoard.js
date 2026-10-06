@@ -74,8 +74,7 @@ export default function DeskBoard({ worldRef, flipped = false, aim, activePenId,
     const { width, height } = e.nativeEvent.layout;
     const aspect = DESK.width / DESK.height; // 1000 / 1500 = 0.666
     
-    // Desk size-ai innum compact-ah aakka height-il 52% mattum eduthukollum
-    let h = height * 0.52;
+    let h = height * 0.58;
     let w = h * aspect;
     
     if (w > width * 0.9) {
@@ -98,7 +97,7 @@ export default function DeskBoard({ worldRef, flipped = false, aim, activePenId,
           <View style={StyleSheet.absoluteFill} pointerEvents="none">
           <ImageBackground
             source={ASSETS.desk}
-            resizeMode="cover"
+            resizeMode="contain"
             style={[StyleSheet.absoluteFill, styles.desk]}
             imageStyle={{ borderRadius: 12 }}
           />
