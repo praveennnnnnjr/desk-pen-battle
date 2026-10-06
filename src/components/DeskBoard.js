@@ -74,11 +74,12 @@ export default function DeskBoard({ worldRef, flipped = false, aim, activePenId,
     const { width, height } = e.nativeEvent.layout;
     const aspect = DESK.width / DESK.height; // 1000 / 1500 = 0.666
     
-    let h = height * 0.58;
+    // Desk size-ai crct-ah align panna height 38% mattum set pannirukom
+    let h = height * 0.38;
     let w = h * aspect;
     
-    if (w > width * 0.9) {
-      w = width * 0.9;
+    if (w > width * 0.8) {
+      w = width * 0.8;
       h = w / aspect;
     }
     setBox({ w, h });
